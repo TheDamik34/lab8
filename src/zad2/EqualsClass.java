@@ -1,10 +1,16 @@
 package zad2;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 public class EqualsClass {
-    private String name;
-    private boolean isFresh;
-    private Integer age;
-    private double money;
+    private String name = "damian";
+    @IgnoreEquals
+    private boolean isRich = true;
+    private Integer age = 0;
+    private double money = 0;
 
     public String getName() {
         return name;
@@ -14,12 +20,12 @@ public class EqualsClass {
         this.name = name;
     }
 
-    public Boolean getFresh() {
-        return isFresh;
+    public Boolean getRich() {
+        return isRich;
     }
 
-    public void setFresh(Boolean fresh) {
-        isFresh = fresh;
+    public void setRich(Boolean rich) {
+        isRich = rich;
     }
 
     public Integer getAge() {
@@ -45,6 +51,31 @@ public class EqualsClass {
             return false;
 
         EqualsClass temp = (EqualsClass) obj;
-        return this.getName().equals(temp.getName()) && this.getFresh() == temp.getFresh() && this.getAge().equals(temp.getAge());
+        return this.getName().equals(temp.getName()) && this.getMoney() == temp.getMoney() && this.getAge().equals(temp.getAge());
+    }
+
+    public boolean equals2(Object obj) {
+        if(!(obj instanceof EqualsClass))
+            return false;
+
+        EqualsClass temp = (EqualsClass) obj;
+
+        Class cls = this.getClass();
+        Field[] fieldsThis = cls.getDeclaredFields();
+        Field[] fieldsObj = cls.getDeclaredFields();
+
+        Field[] filteredFieldsIgnoreThis = Arrays.stream(fieldsThis).filter(field -> field.getAnnotation(IgnoreEquals.class) == null).toArray(Field[]::new);
+        Field[] filteredFieldsIgnoreObj = Arrays.stream(fieldsObj).filter(field -> field.getAnnotation(IgnoreEquals.class) == null).toArray(Field[]::new);
+
+        try {
+            return  filteredFieldsIgnoreThis[0].get(this).equals(filteredFieldsIgnoreObj[0].get(temp)) &&
+                    filteredFieldsIgnoreThis[1].get(this).equals(filteredFieldsIgnoreObj[1].get(temp)) &&
+                    filteredFieldsIgnoreThis[2].get(this).equals(filteredFieldsIgnoreObj[2].get(temp));
+
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 }
