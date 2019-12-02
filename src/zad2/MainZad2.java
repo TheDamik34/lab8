@@ -5,6 +5,10 @@ public class MainZad2 {
         EqualsClass equalsClass = new EqualsClass();
         EqualsClass equalsClass2 = new EqualsClass();
 
-        equalsClass.equals2(equalsClass2);
+
+        System.out.println(equalsClass.equals2(equalsClass2));
+        equalsClass.setAge(10);
+        System.out.println(equalsClass.equals2(equalsClass2));
+
     }
 }

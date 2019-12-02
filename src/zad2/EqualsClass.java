@@ -1,23 +1,15 @@
 package zad2;
 
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
-@Autor(
-        autor = "Damian Jacewicz",
-        iq = 3,
-        znaki = 's'
-)
-public class EqualsClass {
-    private String name;
-    private boolean isFresh;
-    private Integer age;
 
+public class EqualsClass {
+    private String name = "damian";
     @IgnoreEquals
-    private double money;
+    private boolean isRich = true;
+    private Integer age = 0;
+    private double money = 0;
 
     public String getName() {
         return name;
@@ -28,12 +20,12 @@ public class EqualsClass {
         this.name = name;
     }
 
-    public Boolean getFresh() {
-        return isFresh;
+    public Boolean getRich() {
+        return isRich;
     }
 
-    public void setFresh(Boolean fresh) {
-        isFresh = fresh;
+    public void setRich(Boolean rich) {
+        isRich = rich;
     }
 
     public Integer getAge() {
@@ -59,25 +51,31 @@ public class EqualsClass {
             return false;
 
         EqualsClass temp = (EqualsClass) obj;
-        return this.getName().equals(temp.getName()) && this.getFresh() == temp.getFresh() && this.getAge().equals(temp.getAge());
+        return this.getName().equals(temp.getName()) && this.getMoney() == temp.getMoney() && this.getAge().equals(temp.getAge());
     }
 
     public boolean equals2(Object obj) {
-        Class cls = this.getClass();
+        if(!(obj instanceof EqualsClass))
+            return false;
 
-        Field[] fields = cls.getDeclaredFields();
-        for(Field i : fields) {
-            Annotation[] annotations = i.getAnnotations();
-            System.out.println(Arrays.toString(annotations));
-            System.out.println(i.getName());
+        EqualsClass temp = (EqualsClass) obj;
+
+        Class cls = this.getClass();
+        Field[] fieldsThis = cls.getDeclaredFields();
+        Field[] fieldsObj = cls.getDeclaredFields();
+
+        Field[] filteredFieldsIgnoreThis = Arrays.stream(fieldsThis).filter(field -> field.getAnnotation(IgnoreEquals.class) == null).toArray(Field[]::new);
+        Field[] filteredFieldsIgnoreObj = Arrays.stream(fieldsObj).filter(field -> field.getAnnotation(IgnoreEquals.class) == null).toArray(Field[]::new);
+
+        try {
+            return  filteredFieldsIgnoreThis[0].get(this).equals(filteredFieldsIgnoreObj[0].get(temp)) &&
+                    filteredFieldsIgnoreThis[1].get(this).equals(filteredFieldsIgnoreObj[1].get(temp)) &&
+                    filteredFieldsIgnoreThis[2].get(this).equals(filteredFieldsIgnoreObj[2].get(temp));
+
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
 
-       /* Arrays.stream(fields).filter(field -> {
-            Annotation[] annotations = field.getAnnotations();
-        })*/
-
-
-
-        return true;
+        return false;
     }
 }
